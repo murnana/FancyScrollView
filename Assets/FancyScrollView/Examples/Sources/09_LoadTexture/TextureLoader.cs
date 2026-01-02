@@ -24,7 +24,11 @@ namespace FancyScrollView.Example09
             static Loader instance;
 
             public static Loader Instance => instance ??
+        #if UNITY_6000_0_OR_NEWER
+                (instance = FindAnyObjectByType<Loader>() ??
+        #else
                 (instance = FindObjectOfType<Loader>() ??
+        #endif
                     new GameObject(typeof(TextureLoader).Name).AddComponent<Loader>());
 
             public void Load(string url, Action<(string Url, Texture Texture)> onSuccess)
