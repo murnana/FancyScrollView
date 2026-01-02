@@ -172,3 +172,17 @@ When creating a new scroll view:
 - For snap behavior: Configure `Scroller` component's snap settings
 - ScrollRect and GridView variants do NOT support infinite scrolling or snapping
 - Cell position is always normalized (0.0-1.0) - use this for animation calculations
+
+## Development Branch Strategy
+
+This is a fork of [setchi/FancyScrollView](https://github.com/setchi/FancyScrollView). We maintain two branches:
+
+- **`master`**: Syncs with upstream (setchi/FancyScrollView). Keep clean for pulling updates.
+- **`develop`**: Main development branch for custom modifications.
+
+**Workflow:**
+- Daily work: Use `develop` branch
+- Upstream updates: Merge into `master` first, then merge `master` → `develop`
+- License: MIT (Copyright (c) 2020 setchi). Original LICENSE file must be preserved.
+
+**Detailed guide:** See [docs/development/branch-strategy.md](docs/development/branch-strategy.md) (Japanese)

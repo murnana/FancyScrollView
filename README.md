@@ -1,5 +1,8 @@
 # FancyScrollView
 
+> **Note**: このリポジトリは [setchi/FancyScrollView](https://github.com/setchi/FancyScrollView) のフォークです。Unity 6.0 LTS対応とカスタマイズを加えたバージョンとなります。
+> オリジナル版については [元のリポジトリ](https://github.com/setchi/FancyScrollView) を参照してください。
+
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat&cacheSeconds=2592000)](https://github.com/setchi/FancyScrollView/blob/master/LICENSE)
 [![WebGL Demo](https://img.shields.io/badge/demo-WebGL-orange.svg?style=flat&logo=google-chrome&logoColor=white&cacheSeconds=2592000)](https://setchi.jp/FancyScrollView/demo)
 [![API Documentation](https://img.shields.io/badge/API-Documentation-ff69b4.svg?style=flat&logo=c-sharp&cacheSeconds=2592000)](https://setchi.jp/FancyScrollView/api/FancyScrollView.html)
@@ -171,8 +174,26 @@ class EntryPoint : MonoBehaviour
 
 その他の詳細は [Examples](https://github.com/setchi/FancyScrollView/tree/master/Assets/FancyScrollView/Examples) および [API Documentation](https://setchi.jp/FancyScrollView/api/FancyScrollView.html) を参照してください。
 
+## このフォークについて
+
+このリポジトリは [setchi/FancyScrollView](https://github.com/setchi/FancyScrollView) をベースに、以下の変更を加えています:
+
+- Unity 6.0 LTS 対応
+- Unity 6 の新しい API への対応 (`FindAnyObjectByType` など)
+- プロジェクト設定の最新化
+
+詳細な変更内容については [docs/development/modifications.md](docs/development/modifications.md) を参照してください。
+
 ## Author
-[setchi](https://github.com/setchi)
+
+**Original Author**: [setchi](https://github.com/setchi)
+**This Fork**: [murnana](https://github.com/murnana)
 
 ## License
+
 [MIT](https://github.com/setchi/FancyScrollView/blob/master/LICENSE)
+
+このプロジェクトは MIT ライセンスのもとで公開されています。
+Copyright (c) 2020 setchi
+
+元のプロジェクト: https://github.com/setchi/FancyScrollView
