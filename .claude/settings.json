@@ -1,0 +1,15 @@
+{
+  "includeCoAuthoredBy": true,
+  "permissions": {
+    "disableBypassPermissionsMode": "disable",
+    "allow": [
+      "Bash(git log:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)"
+    ],
+    "ask": [],
+    "deny": []
+  },
+  "disableAllHooks": true,
+  "enableAllProjectMcpServers": false
+}
