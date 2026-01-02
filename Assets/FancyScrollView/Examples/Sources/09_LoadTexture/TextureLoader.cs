@@ -48,7 +48,11 @@ namespace FancyScrollView.Example09
                 {
                     yield return request.SendWebRequest();
 
+                #if UNITY_2020_2_OR_NEWER
+                    if(request.result != UnityWebRequest.Result.Success)
+                #else
                     if (request.isNetworkError)
+                #endif
                     {
                         Debug.LogErrorFormat("Error: {0}", request.error);
                         yield break;
