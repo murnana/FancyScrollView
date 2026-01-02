@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 FancyScrollView is a Unity package providing a highly flexible, performant scroll view component with support for infinite scrolling, custom animations, and grid layouts. The library is primarily written in Japanese with Japanese comments throughout the codebase.
 
-**Unity Version:** 2019.4.7f1 (minimum requirement: Unity 2019.4+)
+**Unity Version:** 2021.3.45f2 (minimum requirement: Unity 2019.4+)
 **.NET Version:** 4.x Scripting Runtime
 
 ## Development Commands
