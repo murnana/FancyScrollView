@@ -10,7 +10,54 @@
 
 ## 変更履歴
 
-### 1. Claude Code 統合 (2026-01-02)
+### 1. UPM パッケージ化 (2026-01-02)
+
+**変更内容**:
+- `Assets/FancyScrollView/Sources/` を `Packages/jp.setchi.fancyscrollview/` へ移動
+- ローカル UPM パッケージとして構成
+- `package.json` を追加し、パッケージメタデータを定義
+- コアライブラリとサンプルを分離 (コア: Packages, サンプル: Assets)
+
+**追加ファイル**:
+- `Packages/jp.setchi.fancyscrollview/package.json` - パッケージマニフェスト
+- `Packages/jp.setchi.fancyscrollview/LICENSE` - MIT ライセンス (ルートからコピー)
+- `Packages/jp.setchi.fancyscrollview/README.md` - パッケージ README (ルートからコピー)
+- `Packages/jp.setchi.fancyscrollview/Documentation~/` - ドキュメント (UPM 標準ディレクトリ)
+
+**ディレクトリ構造**:
+```
+Packages/jp.setchi.fancyscrollview/
+├── package.json
+├── LICENSE (.meta: 572727be5c765482ca314fb2581d9392)
+├── README.md (.meta: 96981b0d2ee8645cc94d70563bda2999)
+├── Documentation~/            # ドキュメント (UPM 標準)
+│   ├── development/           # 開発ガイド
+│   └── upm-structure-reference.md
+├── Runtime/ (.meta: dd41a20ffdea64364905efac7fb4aa9b)
+│   ├── FancyScrollView.asmdef (.meta: 59f6770f7492c42ff827a64ac010ac49)
+│   ├── Core/ (.meta: aca07f0cadcbc467ca910639faf19bd9)
+│   ├── Scroller/ (.meta: 691a9f5ee4aec4112a01b9a4332cac51)
+│   ├── ScrollRect/ (.meta: e2c5beedd885c4490a86bb4973f965bf)
+│   └── GridView/ (.meta: c7768f2982b0142ab876d2bb4b597646)
+└── Editor/ (.meta: 3b7adbc21b737494d970fcbd5dbe1175)
+    └── FancyScrollView.Editor.asmdef (.meta: 310eb4609be1c41459e5ebb1bde5ac5a)
+
+Assets/FancyScrollView/
+└── Examples/                  # サンプルシーンとソースコード
+    ├── 01_Basic.unity
+    ├── 02_FocusOn.unity
+    └── ... (全9サンプル)
+```
+
+**目的**:
+- Unity Package Manager によるパッケージ管理を可能にする
+- コアライブラリとサンプルの分離による開発効率の向上
+- 将来的な Git URL によるパッケージインストールに対応
+
+**上流との GUID 一致**:
+Runtime および Editor ディレクトリの .meta ファイル GUID を上流 UPM ブランチと一致させることで、アセット参照の互換性を保証。詳細は [docs/upm-structure-reference.md](../upm-structure-reference.md) を参照。
+
+### 2. Claude Code 統合 (2026-01-02)
 
 **コミット**: `0177b46` - "Add Claude Code configuration files"
 

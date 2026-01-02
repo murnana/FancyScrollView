@@ -11,12 +11,13 @@ FancyScrollView is a Unity package providing a highly flexible, performant scrol
 
 ## Development Commands
 
-This is a Unity project. Development is done through the Unity Editor, not command-line tools.
+This is a Unity project with a local UPM package. Development is done through the Unity Editor, not command-line tools.
 
 ### Opening the Project
 - Open Unity Hub and add this project
 - Ensure you have Unity 6.0+ installed
 - The project will open with the Unity Editor
+- The FancyScrollView package is located in `Packages/jp.setchi.fancyscrollview/`
 
 ### Running Examples
 - Open any scene from `Assets/FancyScrollView/Examples/` (e.g., `01_Basic.unity`, `02_FocusOn.unity`)
@@ -35,7 +36,7 @@ This is a Unity project. Development is done through the Unity Editor, not comma
 
 ### Core Components
 
-The library is organized into four main modules under `Assets/FancyScrollView/Sources/Runtime/`:
+The library is organized into four main modules under `Packages/jp.setchi.fancyscrollview/Runtime/`:
 
 #### 1. Core Module (`Core/`)
 The foundation of the scroll view system.
@@ -100,7 +101,7 @@ The `Context` object enables communication between cells and scroll view:
 - **Use Cases**:
   - Cell → ScrollView: Pass events (e.g., cell clicked)
   - ScrollView → Cell: Pass shared state (e.g., selected index)
-  - See `Assets/FancyScrollView/Examples/Sources/02_FocusOn/Context.cs` for example
+  - See `Assets/FancyScrollView/Examples/02_FocusOn/Context.cs` for example
 
 ```csharp
 // Example Context
@@ -121,25 +122,38 @@ class Context
 ## File Organization
 
 ```
+Packages/jp.setchi.fancyscrollview/
+├── package.json               # UPM package manifest
+├── LICENSE                    # MIT License
+├── README.md                  # Package README
+├── Documentation~/            # Documentation (UPM standard)
+│   ├── development/           # Development guides (branch strategy, modifications)
+│   └── upm-structure-reference.md  # UPM structure reference
+├── Runtime/
+│   ├── Core/                  # Base classes: FancyScrollView, FancyCell
+│   ├── Scroller/              # Scroll control: Scroller, easing utilities
+│   ├── ScrollRect/            # ScrollRect variant (no infinite/snap)
+│   ├── GridView/              # Grid layout variant
+│   └── FancyScrollView.asmdef # Runtime assembly definition
+└── Editor/
+    ├── ScrollerEditor.cs      # Custom inspector for Scroller
+    └── FancyScrollView.Editor.asmdef  # Editor assembly definition
+
 Assets/FancyScrollView/
-├── Sources/
-│   ├── Runtime/
-│   │   ├── Core/              # Base classes: FancyScrollView, FancyCell
-│   │   ├── Scroller/          # Scroll control: Scroller, easing utilities
-│   │   ├── ScrollRect/        # ScrollRect variant (no infinite/snap)
-│   │   └── GridView/          # Grid layout variant
-│   └── Editor/
-│       └── ScrollerEditor.cs  # Custom inspector for Scroller
-└── Examples/
-    ├── 01_Basic/              # Minimal implementation
-    ├── 02_FocusOn/            # Using Context for cell selection
-    ├── 03_InfiniteScroll/     # Loop + Unrestricted movement
-    ├── 04_Metaball/           # Shader-based animation
-    ├── 05_Voronoi/            # Shader-based animation
-    ├── 06_LoopTabBar/         # Tab navigation pattern
-    ├── 07_ScrollRect/         # ScrollRect with scrollbar
-    ├── 08_GridView/           # Grid layout
-    └── 09_LoadTexture/        # Async texture loading
+└── Examples/                  # Sample scenes and code
+    ├── 01_Basic.unity         # Minimal implementation
+    ├── 02_FocusOn.unity       # Using Context for cell selection
+    ├── 03_InfiniteScroll.unity # Loop + Unrestricted movement
+    ├── 04_Metaball.unity      # Shader-based animation
+    ├── 05_Voronoi.unity       # Shader-based animation
+    ├── 06_LoopTabBar.unity    # Tab navigation pattern
+    ├── 07_ScrollRect.unity    # ScrollRect with scrollbar
+    ├── 08_GridView.unity      # Grid layout
+    ├── 09_LoadTexture.unity   # Async texture loading
+    ├── 01_Basic/              # Example source code
+    ├── 02_FocusOn/
+    ├── 03_InfiniteScroll/
+    └── ... (all example sources)
 ```
 
 ## Common Implementation Pattern
@@ -159,9 +173,12 @@ When creating a new scroll view:
 
 ## Important Notes
 
+- **Package Structure**: The package is set up as a local UPM package in `Packages/jp.setchi.fancyscrollview/`
 - **Language**: All comments and documentation in source code are in Japanese
-- **Assembly Definitions**: Core library uses `FancyScrollView.asmdef`
-- **Examples**: Self-contained in `Examples/` folder, safe to modify for learning
+- **Assembly Definitions**:
+  - Runtime: `FancyScrollView.asmdef`
+  - Editor: `FancyScrollView.Editor.asmdef`
+- **Examples**: Located in `Assets/FancyScrollView/Examples/` folder
 - **API Documentation**: Available at https://setchi.jp/FancyScrollView/api/FancyScrollView.html
 - **WebGL Demo**: Available at https://setchi.jp/FancyScrollView/demo
 

@@ -3,6 +3,8 @@
   "permissions": {
     "disableBypassPermissionsMode": "disable",
     "allow": [
+      "WebFetch(https://github.com/setchi/FancyScrollView/*)",
+      "WebFetch(https://raw.githubusercontent.com/setchi/FancyScrollView/*)",
       "Bash(git log:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)"
