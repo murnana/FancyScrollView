@@ -27,20 +27,28 @@ jobs:
     steps:
       # リポジトリのコードを取得します
       - name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
         # Gitタグからバージョン番号を取得します (例: v1.9.0-fork.0 → 1.9.0-fork.0)
       - name: Extract Version
         id: version
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
+
+          # バージョン形式を検証（X.Y.Z-fork.W形式のみ許可）
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-fork\.[0-9]+$ ]]; then
+            echo "❌ 無効なバージョン形式: $VERSION"
+            echo "✅ 正しい形式: X.Y.Z-fork.W (例: 1.9.0-fork.0)"
+            exit 1
+          fi
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "📦 リリースバージョン: $VERSION"
 
       # Unity Libraryフォルダをキャッシュして、ビルド時間を短縮します
       # キャッシュがヒットすると、ビルド時間が大幅に短縮されます（15-25分 → 5-10分）
       - name: Cache Unity Library
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
           path: Library
           key: Library-FancyScrollView-Release-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
@@ -137,7 +145,7 @@ jobs:
       # GitHub Releasesページにリリースを作成し、ZIPファイルをアップロードします
       # リリースノートはコミットログから自動生成されます
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@9d7c94cfd0a1f3ed45544c887983e9fa900f0564 # v1
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
         with:
           files: FancyScrollView-${{ steps.version.outputs.version }}-Windows.zip
           generate_release_notes: true # コミットログから自動でリリースノートを生成
