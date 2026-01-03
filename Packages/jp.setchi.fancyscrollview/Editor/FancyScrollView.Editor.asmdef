@@ -1,16 +1,21 @@
 {
     "name": "FancyScrollView.Editor",
+    "rootNamespace": "",
     "references": [
-        "FancyScrollView"
+        "GUID:59f6770f7492c42ff827a64ac010ac49"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
+    "overrideReferences": true,
     "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": []
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_6000_0_OR_NEWER",
+        "UNITY_EDITOR"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

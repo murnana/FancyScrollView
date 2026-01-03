@@ -1,3 +1,16 @@
-﻿{
-	"name": "FancyScrollView"
+{
+    "name": "FancyScrollView",
+    "rootNamespace": "",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_6000_0_OR_NEWER"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

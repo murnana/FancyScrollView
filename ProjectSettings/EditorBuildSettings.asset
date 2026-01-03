@@ -33,3 +33,4 @@ EditorBuildSettings:
     path: Assets/FancyScrollView/Examples/09_LoadTexture.unity
     guid: eb8cb776d6776468eb0bec979e0c2010
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0
