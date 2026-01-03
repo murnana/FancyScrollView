@@ -28,7 +28,7 @@ permissions: {}
 jobs:
   build:
     name: Unity Windows Build
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 60
     # このジョブに必要な最小限の権限のみを付与
     permissions:
@@ -67,20 +67,22 @@ jobs:
       # ビルドが成功したか確認します
       - name: Verify Build Output
         run: |
-          if [ ! -f "Builds/Player/StandaloneWindows64/FancyScrollView.exe" ]; then
-            echo "❌ ビルド失敗: 実行ファイルが見つかりません"
+          if (!(Test-Path "Builds/Player/StandaloneWindows64/FancyScrollView.exe")) {
+            Write-Host "❌ ビルド失敗: 実行ファイルが見つかりません"
             exit 1
-          fi
-          echo "✅ ビルド成功: 実行ファイルを確認しました"
+          }
+          Write-Host "✅ ビルド成功: 実行ファイルを確認しました"
 
       # ビルドサイズを表示します
       - name: Report Build Size
         run: |
-          echo "📊 ビルドサイズ:"
-          du -sh Builds/Player/StandaloneWindows64/
-          echo ""
-          echo "📁 実行ファイルサイズ:"
-          ls -lh Builds/Player/StandaloneWindows64/FancyScrollView.exe
+          Write-Host "📊 ビルドサイズ:"
+          $size = (Get-ChildItem -Path "Builds/Player/StandaloneWindows64" -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
+          Write-Host ("{0:N2} MB" -f $size)
+          Write-Host ""
+          Write-Host "📁 実行ファイルサイズ:"
+          $exeSize = (Get-Item "Builds/Player/StandaloneWindows64/FancyScrollView.exe").Length / 1MB
+          Write-Host ("{0:N2} MB" -f $exeSize)
 
       # ビルド成果物をGitHub Actionsにアップロードします
       # アップロードされたファイルは、GitHubのActionsタブからダウンロード可能です（7日間保持）
