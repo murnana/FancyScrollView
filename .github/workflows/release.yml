@@ -16,11 +16,29 @@ on:
 permissions: {}
 
 jobs:
-  build-and-release:
-    name: Build and Create Release
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    # このジョブに必要な最小限の権限のみを付与
+  # 再利用可能ワークフローを呼び出してビルドを実行
+  build:
+    name: Build Unity Project
+    uses: ./.github/workflows/unity-build-windows.yml
+    permissions:
+      contents: read # リポジトリのコードを読み取るために必要
+    with:
+      build_name: FancyScrollView
+      builds_path: Builds/Player
+      cache_key_prefix: Library-FancyScrollView-Release
+      versioning: Semantic
+      upload_artifact: false # リリースでは別途ZIPを作成するためアップロードしない
+    secrets:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+
+  # リリースパッケージの作成とGitHub Releaseの公開
+  release:
+    name: Create GitHub Release
+    runs-on: windows-latest
+    needs: build
+    timeout-minutes: 30
     permissions:
       contents: write # GitHub Releasesの作成とアセットのアップロードに必要
 
@@ -29,24 +47,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
-        # Gitタグからバージョン番号を取得します (例: v1.9.0-fork.0 → 1.9.0-fork.0)
+      # Gitタグからバージョン番号を取得します (例: v1.9.0-fork.0 → 1.9.0-fork.0)
       - name: Extract Version
         id: version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
+          $VERSION = "${{ github.ref }}".Replace("refs/tags/v", "")
 
           # バージョン形式を検証（X.Y.Z-fork.W形式のみ許可）
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-fork\.[0-9]+$ ]]; then
-            echo "❌ 無効なバージョン形式: $VERSION"
-            echo "✅ 正しい形式: X.Y.Z-fork.W (例: 1.9.0-fork.0)"
+          if ($VERSION -notmatch '^\d+\.\d+\.\d+-fork\.\d+$') {
+            Write-Host "❌ 無効なバージョン形式: $VERSION"
+            Write-Host "✅ 正しい形式: X.Y.Z-fork.W (例: 1.9.0-fork.0)"
             exit 1
-          fi
+          }
 
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "📦 リリースバージョン: $VERSION"
+          "version=$VERSION" >> $env:GITHUB_OUTPUT
+          Write-Host "📦 リリースバージョン: $VERSION"
 
       # Unity Libraryフォルダをキャッシュして、ビルド時間を短縮します
-      # キャッシュがヒットすると、ビルド時間が大幅に短縮されます（15-25分 → 5-10分）
+      # 注: ビルドは再利用可能ワークフローで実行されるため、ここではキャッシュの復元のみ行います
       - name: Cache Unity Library
         uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
@@ -56,8 +74,8 @@ jobs:
             Library-FancyScrollView-Release-
             Library-FancyScrollView-
 
-      # Unityプロジェクトをビルドします
-      # GameCI Unity Builderを使用してWindows向けにリリースビルド
+      # 再ビルドが必要（再利用可能ワークフローのビルド成果物は自動的に引き継がれないため）
+      # TODO: actions/download-artifactを使用してビルド成果物を取得する方法を検討
       - name: Build Unity Project
         uses: game-ci/unity-builder@1d4ee0697f193f54668e98961d79907911f4b4f2 # v4.8.1
         env:
@@ -74,33 +92,22 @@ jobs:
       # ビルドが成功したか確認します
       - name: Verify Build Output
         run: |
-          if [ ! -f "Builds/Player/StandaloneWindows64/FancyScrollView.exe" ]; then
-            echo "❌ ビルド失敗: 実行ファイルが見つかりません"
+          if (!(Test-Path "Builds/Player/StandaloneWindows64/FancyScrollView.exe")) {
+            Write-Host "❌ ビルド失敗: 実行ファイルが見つかりません"
             exit 1
-          fi
-          echo "✅ ビルド成功: 実行ファイルを確認しました"
-
-      # ビルドサイズを表示します
-      - name: Report Build Size
-        run: |
-          echo "📊 ビルドサイズ:"
-          du -sh Builds/Player/StandaloneWindows64/
-          echo ""
-          echo "📁 実行ファイルサイズ:"
-          ls -lh Builds/Player/StandaloneWindows64/FancyScrollView.exe
+          }
+          Write-Host "✅ ビルド成功: 実行ファイルを確認しました"
 
       # 配布用のZIPファイルを作成します
       # デバッグ用フォルダを除外して、クリーンなリリースパッケージを作成
       - name: Prepare Release Package
         run: |
-          cd Builds/Player/StandaloneWindows64
-
           # デバッグフォルダを削除（配布に不要）
-          rm -rf FancyScrollView_BackUpThisFolder_ButDontShipItWithYourGame
-          rm -rf FancyScrollView_BurstDebugInformation_DoNotShip
+          Remove-Item -Path "Builds/Player/StandaloneWindows64/FancyScrollView_BackUpThisFolder_ButDontShipItWithYourGame" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "Builds/Player/StandaloneWindows64/FancyScrollView_BurstDebugInformation_DoNotShip" -Recurse -Force -ErrorAction SilentlyContinue
 
           # README.txtを作成
-          cat > README.txt << 'EOF'
+          $readmeContent = @"
           FancyScrollView - Unity Scroll View Component
           Version: ${{ steps.version.outputs.version }}
 
@@ -129,18 +136,15 @@ jobs:
           Copyright (c) 2020 setchi
 
           詳細: https://github.com/setchi/FancyScrollView
-          EOF
+          "@
 
-          cd ../../..
+          Set-Content -Path "Builds/Player/StandaloneWindows64/README.txt" -Value $readmeContent -Encoding UTF8
 
           # ZIPファイルを作成
-          cd Builds/Player
-          zip -r FancyScrollView-${{ steps.version.outputs.version }}-Windows.zip StandaloneWindows64
-          mv FancyScrollView-${{ steps.version.outputs.version }}-Windows.zip ../..
-          cd ../..
+          Compress-Archive -Path "Builds/Player/StandaloneWindows64" -DestinationPath "FancyScrollView-${{ steps.version.outputs.version }}-Windows.zip" -Force
 
-          echo "✅ リリースパッケージを作成しました"
-          ls -lh FancyScrollView-${{ steps.version.outputs.version }}-Windows.zip
+          Write-Host "✅ リリースパッケージを作成しました"
+          Get-Item "FancyScrollView-${{ steps.version.outputs.version }}-Windows.zip" | Select-Object Name, @{Name="Size(MB)";Expression={"{0:N2}" -f ($_.Length / 1MB)}}
 
       # GitHub Releasesページにリリースを作成し、ZIPファイルをアップロードします
       # リリースノートはコミットログから自動生成されます
