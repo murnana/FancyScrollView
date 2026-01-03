@@ -120,3 +120,24 @@ This is a fork of [setchi/FancyScrollView](https://github.com/setchi/FancyScroll
 - License: MIT (Copyright (c) 2020 setchi). Original LICENSE file must be preserved.
 
 **Detailed guide:** See [docs/branch-strategy.md](docs/branch-strategy.md) (Japanese)
+
+## Versioning Strategy
+
+This fork uses the `-fork.W` suffix (format: `X.Y.Z-fork.W`) to distinguish from upstream releases.
+
+**Quick reference:**
+- Update `package.json` version → commit → create tag → push tag
+- GitHub Actions automatically builds and publishes releases
+
+**Detailed rules:** See [.claude/rules/versioning.md](.claude/rules/versioning.md) and [docs/versioning.md](docs/versioning.md)
+
+## CI/CD with GitHub Actions
+
+Automated build and release workflows are configured in `.github/workflows/`.
+
+**Quick reference:**
+- PR builds: `.github/workflows/build-samples.yml`
+- Releases: `.github/workflows/release.yml` (triggered by `v*.*.*-fork.*` tags)
+- Requires: `UNITY_LICENSE`, `UNITY_EMAIL`, `UNITY_PASSWORD` secrets
+
+**Detailed guide:** See [docs/github/workflows/ci-cd.md](docs/github/workflows/ci-cd.md)

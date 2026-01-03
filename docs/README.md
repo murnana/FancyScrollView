@@ -10,6 +10,8 @@
 - [**アーキテクチャ**](architecture.md) - 内部構造と設計思想の詳細解説
 - [**API リファレンス**](api-reference.md) - 主要なクラスとメソッドのリファレンス
 - [**ブランチ戦略**](branch-strategy.md) - Git ブランチの運用方針
+- [**バージョニング規則**](versioning.md) - バージョン番号の付け方とリリースフロー
+- [**CI/CD ガイド**](github/workflows/ci-cd.md) - GitHub Actions によるビルドとリリースの自動化
 
 ## 対象読者
 

@@ -1,0 +1,21 @@
+# Dependabot設定ファイル
+# GitHub Actionsの依存関係を自動更新します
+# 詳細: https://docs.github.com/ja/code-security/dependabot/dependabot-version-updates
+
+version: 2
+updates:
+  # GitHub Actionsの依存関係を週次でチェック
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    # PRのレビュワーを設定
+    reviewers:
+      - "murnana"
+    # コミットメッセージのプレフィックス
+    commit-message:
+      prefix: "chore"
+      include: "scope"

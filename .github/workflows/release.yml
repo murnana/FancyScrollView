@@ -1,0 +1,162 @@
+# FancyScrollView リリースワークフロー
+# このワークフローはバージョンタグがプッシュされた時に自動でビルドし、GitHub Releasesに公開します
+# 使用方法: git tag v1.9.0-fork.0 && git push origin v1.9.0-fork.0
+
+name: Create Release
+
+# ワークフローのトリガー設定
+on:
+  # v*.*.*-fork.* 形式のタグがプッシュされた時に実行（例: v1.9.0-fork.0, v2.0.0-fork.1）
+  # 上流リポジトリ（setchi/FancyScrollView）との区別のため -fork.W サフィックスを使用
+  push:
+    tags:
+      - 'v*.*.*-fork.*'
+
+# セキュリティ: デフォルトで全ての権限を無効化
+permissions: {}
+
+jobs:
+  build-and-release:
+    name: Build and Create Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # このジョブに必要な最小限の権限のみを付与
+    permissions:
+      contents: write # GitHub Releasesの作成とアセットのアップロードに必要
+
+    steps:
+      # リポジトリのコードを取得します
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+        # Gitタグからバージョン番号を取得します (例: v1.9.0-fork.0 → 1.9.0-fork.0)
+      - name: Extract Version
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 リリースバージョン: $VERSION"
+
+      # Unity Libraryフォルダをキャッシュして、ビルド時間を短縮します
+      # キャッシュがヒットすると、ビルド時間が大幅に短縮されます（15-25分 → 5-10分）
+      - name: Cache Unity Library
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: Library
+          key: Library-FancyScrollView-Release-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-FancyScrollView-Release-
+            Library-FancyScrollView-
+
+      # Unityプロジェクトをビルドします
+      # GameCI Unity Builderを使用してWindows向けにリリースビルド
+      - name: Build Unity Project
+        uses: game-ci/unity-builder@1d4ee0697f193f54668e98961d79907911f4b4f2 # v4.8.1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: StandaloneWindows64 # Windows 64bit向けビルド
+          unityVersion: auto # ProjectVersion.txtから自動でバージョンを取得
+          buildName: FancyScrollView
+          buildsPath: Builds/Player
+          versioning: Semantic # セマンティックバージョニングを使用
+
+      # ビルドが成功したか確認します
+      - name: Verify Build Output
+        run: |
+          if [ ! -f "Builds/Player/StandaloneWindows64/FancyScrollView.exe" ]; then
+            echo "❌ ビルド失敗: 実行ファイルが見つかりません"
+            exit 1
+          fi
+          echo "✅ ビルド成功: 実行ファイルを確認しました"
+
+      # ビルドサイズを表示します
+      - name: Report Build Size
+        run: |
+          echo "📊 ビルドサイズ:"
+          du -sh Builds/Player/StandaloneWindows64/
+          echo ""
+          echo "📁 実行ファイルサイズ:"
+          ls -lh Builds/Player/StandaloneWindows64/FancyScrollView.exe
+
+      # 配布用のZIPファイルを作成します
+      # デバッグ用フォルダを除外して、クリーンなリリースパッケージを作成
+      - name: Prepare Release Package
+        run: |
+          cd Builds/Player/StandaloneWindows64
+
+          # デバッグフォルダを削除（配布に不要）
+          rm -rf FancyScrollView_BackUpThisFolder_ButDontShipItWithYourGame
+          rm -rf FancyScrollView_BurstDebugInformation_DoNotShip
+
+          # README.txtを作成
+          cat > README.txt << 'EOF'
+          FancyScrollView - Unity Scroll View Component
+          Version: ${{ steps.version.outputs.version }}
+
+          ## 実行方法
+          FancyScrollView.exe をダブルクリックして実行してください。
+
+          ## システム要件
+          - OS: Windows 10/11 (64bit)
+          - DirectX: DirectX 11 以上
+          - メモリ: 4GB RAM 推奨
+
+          ## サンプルシーン
+          このビルドには9つのサンプルシーンが含まれています：
+          1. Basic - 基本的な実装
+          2. FocusOn - セル選択機能
+          3. InfiniteScroll - 無限スクロール
+          4. Metaball - シェーダーアニメーション
+          5. Voronoi - シェーダーアニメーション
+          6. LoopTabBar - タブナビゲーション
+          7. ScrollRect - スクロールバー付き
+          8. GridView - グリッドレイアウト
+          9. LoadTexture - 非同期テクスチャ読み込み
+
+          ## ライセンス
+          MIT License
+          Copyright (c) 2020 setchi
+
+          詳細: https://github.com/setchi/FancyScrollView
+          EOF
+
+          cd ../../..
+
+          # ZIPファイルを作成
+          cd Builds/Player
+          zip -r FancyScrollView-${{ steps.version.outputs.version }}-Windows.zip StandaloneWindows64
+          mv FancyScrollView-${{ steps.version.outputs.version }}-Windows.zip ../..
+          cd ../..
+
+          echo "✅ リリースパッケージを作成しました"
+          ls -lh FancyScrollView-${{ steps.version.outputs.version }}-Windows.zip
+
+      # GitHub Releasesページにリリースを作成し、ZIPファイルをアップロードします
+      # リリースノートはコミットログから自動生成されます
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@9d7c94cfd0a1f3ed45544c887983e9fa900f0564 # v1
+        with:
+          files: FancyScrollView-${{ steps.version.outputs.version }}-Windows.zip
+          generate_release_notes: true # コミットログから自動でリリースノートを生成
+          draft: false # 下書きではなく、即座に公開
+          prerelease: false # プレリリースではない
+          body: |
+            ## FancyScrollView ${{ steps.version.outputs.version }}
+
+            このリリースには、FancyScrollViewのサンプルシーンを含むWindows向けビルドが含まれています。
+
+            ### ダウンロード
+            - **Windows (64bit)**: FancyScrollView-${{ steps.version.outputs.version }}-Windows.zip
+
+            ### インストール方法
+            1. ZIPファイルをダウンロード
+            2. 任意のフォルダに解凍
+            3. FancyScrollView.exe を実行
+
+            ### 変更履歴
+            詳細は下記の自動生成されたリリースノートを参照してください。
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
