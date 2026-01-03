@@ -121,6 +121,21 @@ This is a fork of [setchi/FancyScrollView](https://github.com/setchi/FancyScroll
 
 **Detailed guide:** See [docs/branch-strategy.md](docs/branch-strategy.md) (Japanese)
 
+## Commit Messages and Pull Requests
+
+**IMPORTANT**: All commit messages and pull request descriptions MUST be written in **English**.
+
+**Commit Message Format:**
+- Use conventional commits format: `type: description`
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- Example: `fix: resolve Windows IL2CPP build issue in GitHub Actions`
+- Body and footer can provide additional context in English
+
+**Pull Request Format:**
+- Title: Clear, concise description in English
+- Description: Include problem, solution, and testing details in English
+- Code comments: Keep existing Japanese comments in source code unchanged
+
 ## Versioning Strategy
 
 This fork uses the `-fork.W` suffix (format: `X.Y.Z-fork.W`) to distinguish from upstream releases.
