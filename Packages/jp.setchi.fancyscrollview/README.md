@@ -182,7 +182,7 @@ class EntryPoint : MonoBehaviour
 - Unity 6 の新しい API への対応 (`FindAnyObjectByType` など)
 - プロジェクト設定の最新化
 
-詳細な変更内容については [docs/development/modifications.md](docs/development/modifications.md) を参照してください。
+詳細な変更内容については [Documentation~/modifications/modifications.md](Documentation~/modifications/modifications.md) を参照してください。
 
 ## Author
 
